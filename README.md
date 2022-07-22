@@ -22,3 +22,6 @@ xslt, полнотекстовый	 поиск
 
 парсер должен записывать в бд
 пожключить элестиксерч + сюда отправлять (создать индекс и сохранять)
+
+1) docker-compose up
+2) You can use spring.datasource.url=jdbc:postgresql://127.0.0.1:5433/RSS_manager
