@@ -3,11 +3,13 @@ package com.manager.rss.controllers;
 import com.manager.rss.entity.RssFeed;
 import com.manager.rss.service.dao.RssFeedInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -64,6 +66,13 @@ public class RssFeedController {
     public ResponseEntity changeCurrentRssFeedPosition(@PathVariable final Long id) {
         RssFeedInterface.changeCurrentPosition(id);
         return new ResponseEntity("Rss feed current position update successfully", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/changeUpdateDate/{id}", method = RequestMethod.PUT)
+    public ResponseEntity changeUpdateDate(@PathVariable final Long id) {
+        Date d = new Date();
+        RssFeedInterface.changeUpdateDate(id, d);
+        return new ResponseEntity("Rss feed date update successfully", HttpStatus.OK);
     }
 
     /**

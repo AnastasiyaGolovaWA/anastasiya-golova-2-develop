@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,6 +34,11 @@ public class RssFeedService implements RssFeedInterface {
     @Override
     public void changeCurrentPosition(final long id) {
         rssFeedRepository.changeOfCurrentPosition(id);
+    }
+
+    @Override
+    public void changeUpdateDate(final long id, final Date date) {
+        rssFeedRepository.changeUpdateDate(id, date);
     }
 
     @Override

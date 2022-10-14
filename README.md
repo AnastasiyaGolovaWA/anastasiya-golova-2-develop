@@ -25,3 +25,18 @@ xslt, полнотекстовый	 поиск
 
 1) docker-compose up
 2) You can use spring.datasource.url=jdbc:postgresql://127.0.0.1:5433/RSS_manager
+
+Url	Дата добавления	Дата обновления	Вкл/Выкл ленту
+Включена	https://www.vedomosti.ru/rss/rubric/realty/architecture	2022-12-12 00:00:00	2022-12-12 00:00:00		
+Включена	https://www.houzz.ru/getGalleries/featured/out-rss	2022-12-12 00:00:00	2022-12-12 00:00:00		
+Включена	http://www.finmarket.ru/rss/mainnews.asp	2022-12-12 00:00:00	2022-12-12 00:00:00		
+Включена	https://naavtotrasse.ru/feed	2022-12-12 00:00:00	2022-12-12 00:00:00		
+Включена	http://umpako.com/feed/rss.xml	2022-12-12 00:00:00	2022-12-12 00:00:00		
+Включена	https://naked-science.ru/?yandex_feed=news
+http://itnews.com.ua/export/hard.rss
+http://itnews.com.ua/export/technologies.rss
+http://itnews.com.ua/export/all.rss
+
+---
+https://naked-science.ru/?yandex_feed=news
+http://www.ixbt.com/export/softnews.rss

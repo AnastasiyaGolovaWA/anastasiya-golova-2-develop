@@ -3,6 +3,7 @@ package com.manager.rss.entity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,8 +25,10 @@ public class RssFeed {
     private String url;
 
     @Column
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateCreated;
 
     @Column
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateUpdated;
 }

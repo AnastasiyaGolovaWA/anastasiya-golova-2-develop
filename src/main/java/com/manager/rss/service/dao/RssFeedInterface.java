@@ -2,6 +2,7 @@ package com.manager.rss.service.dao;
 
 import com.manager.rss.entity.RssFeed;
 
+import java.util.Date;
 import java.util.List;
 
 public interface RssFeedInterface {
@@ -12,6 +13,8 @@ public interface RssFeedInterface {
     List<RssFeed> getAll();
 
     void changeCurrentPosition(final long id);
+
+    void changeUpdateDate(final long id, final Date date);
 
     RssFeed getRssFeedOne(long id);
 
