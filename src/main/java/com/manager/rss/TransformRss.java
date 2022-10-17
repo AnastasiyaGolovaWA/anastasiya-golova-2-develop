@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+
 
 @Service
 public class TransformRss {
@@ -24,9 +26,9 @@ public class TransformRss {
         this.rssNewsInterface = rssNewsInterface;
     }
 
-    @Scheduled(initialDelay = 2000, fixedRate = 100000)
+    @Scheduled(initialDelay = 2000, fixedRate = 10000)
     @Async
-    public void getNewsFromRssFeed() {
+    public void getNewsFromRssFeed() throws ParseException {
         newsInterface.save(rssFeedInterface.getAll());
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class NewsController {
      * @return
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity addNews(@RequestBody final List<RssFeed> rssFeed) {
+    public ResponseEntity addNews(@RequestBody final List<RssFeed> rssFeed) throws ParseException {
         newsInterface.save(rssFeed);
         return new ResponseEntity("News add successfully", HttpStatus.OK);
     }

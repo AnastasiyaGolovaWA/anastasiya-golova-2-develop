@@ -4,6 +4,7 @@ import com.manager.rss.entity.News;
 import com.manager.rss.entity.RssFeed;
 import com.manager.rss.entity.dto.NewsDto;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface NewsInterface {
@@ -11,7 +12,7 @@ public interface NewsInterface {
 
     List<NewsDto> getNews();
 
-    void save(final List<RssFeed> rssFeed);
+    void save(final List<RssFeed> rssFeed) throws ParseException;
 
     void clear();
 

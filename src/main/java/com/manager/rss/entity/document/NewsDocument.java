@@ -7,6 +7,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.Date;
+
 @Document(indexName = "index")
 @Data
 public class NewsDocument {
@@ -22,6 +24,6 @@ public class NewsDocument {
     @Field(type = FieldType.Keyword, name = "description")
     private String description;
 
-    @Field(type = FieldType.Date_Range, name = "pubDate", format = DateFormat.date)
-    private String pubDate;
+    @Field(type = FieldType.Date, name = "pubDate", format = DateFormat.date)
+    private Date pubDate;
 }
