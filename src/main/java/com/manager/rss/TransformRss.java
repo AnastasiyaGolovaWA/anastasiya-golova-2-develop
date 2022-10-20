@@ -26,7 +26,7 @@ public class TransformRss {
         this.rssNewsInterface = rssNewsInterface;
     }
 
-    @Scheduled(initialDelay = 2000, fixedRate = 10000)
+    @Scheduled(initialDelay = 2000, fixedRate = 1000000)
     @Async
     public void getNewsFromRssFeed() throws ParseException {
         newsInterface.save(rssFeedInterface.getAll());

@@ -85,7 +85,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) {
-        QueryBuilder queryBuilder = wildcardQuery("tittle", "*" + query + "*");
+        QueryBuilder queryBuilder = regexpQuery("tittle", ".*" + query + ".*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
@@ -107,7 +107,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByDescription(final String query) {
-        QueryBuilder queryBuilder = wildcardQuery("description", "*" + query + "*");
+        QueryBuilder queryBuilder = regexpQuery("description", ".*" + query + ".*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
