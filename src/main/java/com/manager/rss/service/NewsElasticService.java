@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
@@ -62,14 +61,13 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearchByDate(final String query) {
-        Date date = new Date("14 Jan 2022 15:41:27 +0000");
-        Date date1 = new Date("19 Jan 2022 15:41:27 +0000");
+    public List<NewsDocument> processSearchByDate(String query) {
+        Date date = new Date("Thu, 20 Oct 2022 19:08:49 +0300");
+        Date date1 = new Date("Thu, 20 Oct 2023 19:08:49 +0300");
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
 
         queryBuilder.must(
-                multiMatchQuery(query, "tittle", "description")
-                        .fuzziness(Fuzziness.AUTO).operator(Operator.AND));
+                wildcardQuery("tittle", "*" + query + "*"));
 
         queryBuilder.must(rangeQuery("pubDate").from(date).to(date1));
 
@@ -86,28 +84,46 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearch(final String query) {
-        // 1. Create query on multiple fields enabling fuzzy search
-        QueryBuilder queryBuilder =
-                multiMatchQuery(query, "tittle", "description")
-                        .fuzziness(Fuzziness.AUTO).operator(Operator.AND);
+    public List<NewsDocument> processSearchByTittle(final String query) {
+        QueryBuilder queryBuilder = wildcardQuery("tittle", "*" + query + "*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
+                .withPageable(PageRequest.of(0, 5))
                 .build();
 
-        // 2. Execute search
-        SearchHits<NewsDocument> newsHits =
-                elasticsearchOperations
-                        .search(searchQuery, NewsDocument.class,
-                                IndexCoordinates.of(NEWS_INDEX));
+        SearchHits<NewsDocument> searchHits =
+                elasticsearchOperations.search(searchQuery,
+                        NewsDocument.class,
+                        IndexCoordinates.of(NEWS_INDEX));
 
-        // 3. Map searchHits to product list
-        List<NewsDocument> newsMatches = new ArrayList<NewsDocument>();
-        newsHits.forEach(srchHit -> {
-            newsMatches.add(srchHit.getContent());
+        List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
+
+        searchHits.getSearchHits().forEach(searchHit -> {
+            newsDocuments.add(searchHit.getContent());
         });
-        return newsMatches;
+        return newsDocuments;
     }
 
+    @Override
+    public List<NewsDocument> processSearchByDescription(final String query) {
+        QueryBuilder queryBuilder = wildcardQuery("description", "*" + query + "*");
+
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withFilter(queryBuilder)
+                .withPageable(PageRequest.of(0, 5))
+                .build();
+
+        SearchHits<NewsDocument> searchHits =
+                elasticsearchOperations.search(searchQuery,
+                        NewsDocument.class,
+                        IndexCoordinates.of(NEWS_INDEX));
+
+        List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
+
+        searchHits.getSearchHits().forEach(searchHit -> {
+            newsDocuments.add(searchHit.getContent());
+        });
+        return newsDocuments;
+    }
 }

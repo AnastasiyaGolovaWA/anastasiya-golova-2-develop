@@ -15,9 +15,11 @@ public interface NewsElasticInterface {
 
     List<NewsDocument> getAll();
 
-    List<NewsDocument> processSearch(final String query);
-
     Page<NewsDocument> findAll();
 
     List<NewsDocument> processSearchByDate(final String query);
+
+    List<NewsDocument> processSearchByTittle(final String query);
+
+    List<NewsDocument> processSearchByDescription(final String query);
 }

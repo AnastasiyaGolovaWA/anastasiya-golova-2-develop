@@ -19,8 +19,8 @@ public class NewsElasticController {
 
     @ResponseBody
     @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
-    public Page<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) {
-        return newsElasticInterface.getNewsByTittle(tittle, PageRequest.of(0, 20));
+    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) {
+        return newsElasticInterface.processSearchByTittle(tittle);
     }
 
     /**
@@ -38,10 +38,11 @@ public class NewsElasticController {
      * @param query
      * @return
      */
+
     @GetMapping("/news")
     @ResponseBody
-    public List<NewsDocument> fetchByTittleOrDescription(@RequestParam(value = "q", required = false) final String query) {
-        List<NewsDocument> news = newsElasticInterface.processSearch(query);
+    public List<NewsDocument> fetchByDescription(@RequestParam(value = "q", required = false) final String query) {
+        List<NewsDocument> news = newsElasticInterface.processSearchByDescription(query);
         return news;
     }
 

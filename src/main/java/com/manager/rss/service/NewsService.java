@@ -78,6 +78,7 @@ public class NewsService implements NewsInterface {
                     newsDocument.setLink(feed.get(i).getLink());
                     newsDocument.setTittle(feed.get(i).getTittle());
                     if (feed.get(i).getPubDate() != null && !feed.get(i).getPubDate().isEmpty()) {
+                        //newsDocument.setPubDate(feed.get(i).getPubDate());
                         newsDocument.setPubDate(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH).parse(feed.get(i).getPubDate()));
                     }
                     newsElasticInterface.save(newsDocument);
