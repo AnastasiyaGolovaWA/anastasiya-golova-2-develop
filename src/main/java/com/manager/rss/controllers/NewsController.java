@@ -65,6 +65,20 @@ public class NewsController {
         return news;
     }
 
+    /**
+     * Find news by tittle
+     *
+     * @return
+     */
+    @RequestMapping(value = "/findByTittleWithSql", method = RequestMethod.GET)
+    public String[] findByTittleWithSql() {
+        long startTime = System.nanoTime();
+        List<News> news = newsInterface.findByTittleWithSql();
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        return new String[]{duration / 1000000 + "мс", "Длина массива "+String.valueOf(news.size())};
+    }
+
 
     /**
      * Clear table

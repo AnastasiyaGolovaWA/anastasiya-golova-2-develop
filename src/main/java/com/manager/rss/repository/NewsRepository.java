@@ -1,12 +1,13 @@
 package com.manager.rss.repository;
 
 import com.manager.rss.entity.News;
+import lombok.Setter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 public interface NewsRepository extends JpaRepository<News, Long> {
     @Modifying
     @Query(value = "DELETE FROM news", nativeQuery = true)
@@ -17,4 +18,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     @Query(value = "SELECT id_news, description, tittle, pub_date, link FROM news", nativeQuery = true)
     List<News> getNews();
+
+    @Query(value = "select * from news where tittle ilike '%вод%'", nativeQuery = true)
+    List<News> findByTittle();
 }

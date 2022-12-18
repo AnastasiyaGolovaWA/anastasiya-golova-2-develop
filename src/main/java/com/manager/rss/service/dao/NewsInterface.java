@@ -12,6 +12,8 @@ public interface NewsInterface {
 
     List<NewsDto> getNews();
 
+    List<News> findByTittleWithSql();
+
     void save(final List<RssFeed> rssFeed) throws ParseException;
 
     void clear();

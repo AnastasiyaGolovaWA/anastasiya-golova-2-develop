@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -62,6 +60,11 @@ public class NewsService implements NewsInterface {
     }
 
     @Override
+    public List<News> findByTittleWithSql() {
+        return newsRepository.findByTittle();
+    }
+
+    @Override
     public void save(final List<RssFeed> rssFeed) throws ParseException {
         for (int k = 0; k < rssFeed.size(); k++) {
             final RssFeedParser parser = new RssFeedParser(rssFeed.get(k).getUrl());
@@ -78,7 +81,6 @@ public class NewsService implements NewsInterface {
                     newsDocument.setLink(feed.get(i).getLink());
                     newsDocument.setTittle(feed.get(i).getTittle());
                     if (feed.get(i).getPubDate() != null && !feed.get(i).getPubDate().isEmpty()) {
-                        //newsDocument.setPubDate(feed.get(i).getPubDate());
                         newsDocument.setPubDate(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH).parse(feed.get(i).getPubDate()));
                     }
                     newsElasticInterface.save(newsDocument);

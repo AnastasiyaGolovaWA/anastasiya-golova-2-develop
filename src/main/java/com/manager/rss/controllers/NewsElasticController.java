@@ -4,7 +4,6 @@ import com.manager.rss.entity.document.NewsDocument;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +20,16 @@ public class NewsElasticController {
     @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
     public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) {
         return newsElasticInterface.processSearchByTittle(tittle);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/tittle_time/{tittle}", method = RequestMethod.GET)
+    public String[] getTittleTime(@PathVariable("tittle") final String tittle) {
+        long startTime = System.nanoTime();
+        List<NewsDocument> news = newsElasticInterface.processSearchByTittle(tittle);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        return new String[]{duration / 1000000 + "мс", "Длина массива "+String.valueOf(news.size())};
     }
 
     /**

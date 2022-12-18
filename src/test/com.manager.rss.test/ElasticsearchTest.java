@@ -2,6 +2,7 @@ package com.manager.rss.test;
 
 import com.manager.rss.entity.document.NewsDocument;
 import com.manager.rss.service.NewsElasticService;
+import com.manager.rss.service.NewsService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,9 @@ class ElasticsearchTest {
 
     @Autowired
     private NewsElasticService newsElasticService;
+
+    @Autowired
+    private NewsService newsService;
 
     @Container
     private static ElasticsearchContainer elasticsearchContainer = new NewsElasticsearchContainer();
