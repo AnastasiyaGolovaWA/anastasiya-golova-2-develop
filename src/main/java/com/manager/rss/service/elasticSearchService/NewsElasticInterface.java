@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface NewsElasticInterface {
@@ -17,9 +18,9 @@ public interface NewsElasticInterface {
 
     Page<NewsDocument> findAll();
 
-    List<NewsDocument> processSearchByDate(final String query);
+    List<NewsDocument> processSearchByDate(String date, String date1) throws IOException;
 
-    List<NewsDocument> processSearchByTittle(final String query);
+    List<NewsDocument> processSearchByTittle(final String query) throws IOException;
 
-    List<NewsDocument> processSearchByDescription(final String query);
+    List<NewsDocument> processSearchByDescription(final String query) throws IOException;
 }

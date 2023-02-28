@@ -12,6 +12,7 @@ import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.parser.RssFeedParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,8 +61,13 @@ public class NewsService implements NewsInterface {
     }
 
     @Override
-    public List<News> findByTittleWithSql() {
-        return newsRepository.findByTittle();
+    public List<News> findByTittleWithSql(String tittle) {
+        return newsRepository.findByTittle(tittle);
+    }
+
+    @Override
+    public List<News> findByDescriptionWithSql(String description) {
+        return newsRepository.findByDescription(description);
     }
 
     @Override

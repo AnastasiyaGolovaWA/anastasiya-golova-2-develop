@@ -2,11 +2,12 @@ package com.manager.rss.service;
 
 import com.google.common.collect.Lists;
 import com.manager.rss.entity.document.NewsDocument;
+import com.manager.rss.entity.document.TimeDocument;
 import com.manager.rss.repository.elasticsearchRepository.NewsElasticSearchRepo;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
-import org.elasticsearch.common.unit.Fuzziness;
+import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
+import com.opencsv.CSVWriter;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,14 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.regexpQuery;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
@@ -33,11 +37,16 @@ public class NewsElasticService implements NewsElasticInterface {
 
     private final NewsElasticSearchRepo repository;
 
+    private final TimeDocumentInterface timeDocumentInterface;
+
+    String csvFile = "time_elastic.csv";
+
     @Autowired
-    public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository) {
+    public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository, final TimeDocumentInterface timeDocumentInterface) {
         super();
         this.elasticsearchOperations = elasticsearchOperations;
         this.repository = repository;
+        this.timeDocumentInterface = timeDocumentInterface;
     }
 
     @Override
@@ -61,13 +70,10 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearchByDate(String query) {
-        Date date = new Date("Thu, 20 Oct 2022 19:08:49 +0300");
-        Date date1 = new Date("Thu, 20 Oct 2023 19:08:49 +0300");
+    public List<NewsDocument> processSearchByDate(String date_, String date1_) throws IOException {
+        LocalDate date = LocalDate.parse(date_);
+        LocalDate date1 =LocalDate.parse(date1_);
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-
-        queryBuilder.must(
-                wildcardQuery("tittle", "*" + query + "*"));
 
         queryBuilder.must(rangeQuery("pubDate").from(date).to(date1));
 
@@ -75,27 +81,53 @@ public class NewsElasticService implements NewsElasticInterface {
                 .withQuery(queryBuilder)
                 .build();
 
+        long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
         SearchHits<NewsDocument> newsHits = elasticsearchOperations.search(searchQuery, NewsDocument.class);
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+        System.out.println("Execution time: " + executionTime + "ms");
+        FileWriter writer = new FileWriter(csvFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(executionTime)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
+
+        TimeDocument timeDocument = new TimeDocument();
+        timeDocument.setTime(executionTime);
+        timeDocumentInterface.save(timeDocument);
+
         List<NewsDocument> newsMatches = new ArrayList<NewsDocument>();
         newsHits.forEach(srchHit -> {
             newsMatches.add(srchHit.getContent());
         });
+
         return newsMatches;
     }
 
     @Override
-    public List<NewsDocument> processSearchByTittle(final String query) {
+    public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
         QueryBuilder queryBuilder = regexpQuery("tittle", ".*" + query + ".*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
-
+        long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
         SearchHits<NewsDocument> searchHits =
                 elasticsearchOperations.search(searchQuery,
                         NewsDocument.class,
                         IndexCoordinates.of(NEWS_INDEX));
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+        System.out.println("Execution time: " + executionTime + "ms");
+        FileWriter writer = new FileWriter(csvFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(executionTime)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
+        TimeDocument timeDocument = new TimeDocument();
+        timeDocument.setTime(executionTime);
+        timeDocumentInterface.save(timeDocument);
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
@@ -106,18 +138,29 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearchByDescription(final String query) {
+    public List<NewsDocument> processSearchByDescription(final String query) throws IOException {
         QueryBuilder queryBuilder = regexpQuery("description", ".*" + query + ".*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
-
+        long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
         SearchHits<NewsDocument> searchHits =
                 elasticsearchOperations.search(searchQuery,
                         NewsDocument.class,
                         IndexCoordinates.of(NEWS_INDEX));
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+        System.out.println("Execution time: " + executionTime + "ms");
+        FileWriter writer = new FileWriter(csvFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(executionTime)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
+        TimeDocument timeDocument = new TimeDocument();
+        timeDocument.setTime(executionTime);
+        timeDocumentInterface.save(timeDocument);
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 

@@ -3,12 +3,15 @@ package com.manager.rss.controllers;
 import com.manager.rss.entity.News;
 import com.manager.rss.entity.RssFeed;
 import com.manager.rss.service.dao.NewsInterface;
+import com.opencsv.CSVWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -17,6 +20,8 @@ import java.util.List;
 @RequestMapping("/news")
 public class NewsController {
     private NewsInterface newsInterface;
+
+    String csvSqlFile = "time_sql.csv";
 
     @Autowired
     public void setNewsInterface(final NewsInterface newsInterface) {
@@ -60,8 +65,16 @@ public class NewsController {
      * @return
      */
     @RequestMapping(value = "/showByParametres", method = RequestMethod.GET)
-    public List<News> findByTittleOrDescription(@RequestParam(required = false, defaultValue = "") final String tittle, @RequestParam(required = false, defaultValue = "") String description) {
+    public List<News> findByTittleOrDescription(@RequestParam(required = false, defaultValue = "") final String tittle, @RequestParam(required = false, defaultValue = "") String description) throws IOException {
+        long startTime = System.nanoTime();
         List<News> news = newsInterface.findByTittleOrDescription(tittle, description);
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long duration = (endTime - startTime) / 1000000;
+        FileWriter writer = new FileWriter(csvSqlFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(duration)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
         return news;
     }
 
@@ -71,11 +84,35 @@ public class NewsController {
      * @return
      */
     @RequestMapping(value = "/findByTittleWithSql", method = RequestMethod.GET)
-    public String[] findByTittleWithSql() {
+    public String[] findByTittleWithSql(@RequestParam(required = false, defaultValue = "") final String tittle) throws IOException {
         long startTime = System.nanoTime();
-        List<News> news = newsInterface.findByTittleWithSql();
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime);
+        List<News> news = newsInterface.findByTittleWithSql(tittle);
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long duration = (endTime - startTime) / 1000000;
+        FileWriter writer = new FileWriter(csvSqlFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(duration)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
+        return new String[]{duration / 1000000 + "мс", "Длина массива "+String.valueOf(news.size())};
+    }
+
+    /**
+     * Find news by description
+     *
+     * @return
+     */
+    @RequestMapping(value = "/findByDescriptionWithSql", method = RequestMethod.GET)
+    public String[] findByDescriptionWithSql(@RequestParam(required = false, defaultValue = "") final String description) throws IOException {
+        long startTime = System.nanoTime();
+        List<News> news = newsInterface.findByDescriptionWithSql(description);
+        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long duration = (endTime - startTime) / 1000000;
+        FileWriter writer = new FileWriter(csvSqlFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(duration)};
+        csvWriter.writeNext(data);
+        csvWriter.close();
         return new String[]{duration / 1000000 + "мс", "Длина массива "+String.valueOf(news.size())};
     }
 

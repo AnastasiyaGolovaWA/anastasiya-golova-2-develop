@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,9 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     @Query(value = "SELECT id_news, description, tittle, pub_date, link FROM news", nativeQuery = true)
     List<News> getNews();
 
-    @Query(value = "select * from news where tittle ilike '%вод%'", nativeQuery = true)
-    List<News> findByTittle();
+    @Query(value = "SELECT * FROM news WHERE tittle ILIKE %:tittle%", nativeQuery = true)
+    List<News> findByTittle(@Param("tittle") String title);
+
+    @Query(value = "SELECT * FROM news WHERE description ILIKE %:description%", nativeQuery = true)
+    List<News> findByDescription(@Param("description") String description);
 }

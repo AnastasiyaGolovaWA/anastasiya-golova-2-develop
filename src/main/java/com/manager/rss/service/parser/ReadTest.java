@@ -10,6 +10,6 @@ public class ReadTest extends NewsService {
     }
 
     public static void main(String[] args) {
-        new NewsService(new NewsMapper()).findByTittleWithSql();
+       // new NewsService(new NewsMapper()).findByTittleWithSql();
     }
 }

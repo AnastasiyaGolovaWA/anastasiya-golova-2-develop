@@ -12,7 +12,9 @@ public interface NewsInterface {
 
     List<NewsDto> getNews();
 
-    List<News> findByTittleWithSql();
+    List<News> findByTittleWithSql(String tittle);
+
+    List<News> findByDescriptionWithSql(String description);
 
     void save(final List<RssFeed> rssFeed) throws ParseException;
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,13 +19,13 @@ public class NewsElasticController {
 
     @ResponseBody
     @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
-    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) {
+    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) throws IOException {
         return newsElasticInterface.processSearchByTittle(tittle);
     }
 
     @ResponseBody
     @RequestMapping(value = "/tittle_time/{tittle}", method = RequestMethod.GET)
-    public String[] getTittleTime(@PathVariable("tittle") final String tittle) {
+    public String[] getTittleTime(@PathVariable("tittle") final String tittle) throws IOException {
         long startTime = System.nanoTime();
         List<NewsDocument> news = newsElasticInterface.processSearchByTittle(tittle);
         long endTime = System.nanoTime();
@@ -50,15 +51,15 @@ public class NewsElasticController {
 
     @GetMapping("/news")
     @ResponseBody
-    public List<NewsDocument> fetchByDescription(@RequestParam(value = "q", required = false) final String query) {
+    public List<NewsDocument> fetchByDescription(@RequestParam(value = "q", required = false) final String query) throws IOException {
         List<NewsDocument> news = newsElasticInterface.processSearchByDescription(query);
         return news;
     }
 
     @GetMapping("/date")
     @ResponseBody
-    public List<NewsDocument> findByDate(@RequestParam(value = "q", required = false) final String query) {
-        List<NewsDocument> news = newsElasticInterface.processSearchByDate(query);
+    public List<NewsDocument> findByDate(@RequestParam(required = false, defaultValue = "") final String date, @RequestParam(required = false, defaultValue = "") String date1) throws IOException {
+        List<NewsDocument> news = newsElasticInterface.processSearchByDate(date, date1);
         return news;
     }
 
