@@ -1,9 +1,11 @@
 package com.manager.rss.service;
 
 import com.google.common.collect.Lists;
+import com.manager.rss.entity.News;
 import com.manager.rss.entity.document.NewsDocument;
 import com.manager.rss.entity.document.TimeDocument;
 import com.manager.rss.repository.elasticsearchRepository.NewsElasticSearchRepo;
+import com.manager.rss.service.dao.NewsInterface;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
@@ -39,14 +41,19 @@ public class NewsElasticService implements NewsElasticInterface {
 
     private final TimeDocumentInterface timeDocumentInterface;
 
+    private final NewsInterface newsInterface;
+
     String csvFile = "time_elastic.csv";
 
+    String csvSqlFile = "time_sql.csv";
+
     @Autowired
-    public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository, final TimeDocumentInterface timeDocumentInterface) {
+    public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository, final TimeDocumentInterface timeDocumentInterface, final NewsInterface newsInterface) {
         super();
         this.elasticsearchOperations = elasticsearchOperations;
         this.repository = repository;
         this.timeDocumentInterface = timeDocumentInterface;
+        this.newsInterface = newsInterface;
     }
 
     @Override
@@ -128,6 +135,16 @@ public class NewsElasticService implements NewsElasticInterface {
         TimeDocument timeDocument = new TimeDocument();
         timeDocument.setTime(executionTime);
         timeDocumentInterface.save(timeDocument);
+
+        long startTime_ = System.nanoTime();
+        List<News> news = newsInterface.findByTittleWithSql(query);
+        long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long duration = (endTime_ - startTime_) / 1000000;
+        FileWriter writer_ = new FileWriter(csvSqlFile, true);
+        CSVWriter csvWriter_ = new CSVWriter(writer_);
+        String[] data_ = {String.valueOf(duration)};
+        csvWriter_.writeNext(data_);
+        csvWriter_.close();
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
