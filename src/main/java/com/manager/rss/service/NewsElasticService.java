@@ -159,10 +159,14 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByDescription(final String query) throws IOException {
-        QueryBuilder queryBuilder = regexpQuery("description", ".*" + query + ".*");
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + query.toLowerCase() + "*"));
+        boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + query.toUpperCase() + "*"));
+        boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
+
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(queryBuilder)
+                .withFilter(boolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
         long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
