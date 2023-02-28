@@ -113,7 +113,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        QueryBuilder queryBuilder = regexpQuery("tittle", ".*" + query + ".*");
+        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("tittle", query+"*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
