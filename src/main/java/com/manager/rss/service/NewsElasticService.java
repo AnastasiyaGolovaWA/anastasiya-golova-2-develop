@@ -113,15 +113,14 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toLowerCase() + "*"));
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toUpperCase() + "*"));
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
+        QueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery("*" + query.toLowerCase() + "* OR *" + query.toUpperCase() + "* OR *" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*")
+                .field("tittle");
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(boolQuery)
+                .withFilter(queryStringQueryBuilder)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
+
         long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
         SearchHits<NewsDocument> searchHits =
                 elasticsearchOperations.search(searchQuery,
@@ -130,6 +129,7 @@ public class NewsElasticService implements NewsElasticInterface {
         long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         System.out.println("Execution time: " + executionTime + "ms");
+
         FileWriter writer = new FileWriter(csvFile, true);
         CSVWriter csvWriter = new CSVWriter(writer);
         String[] data = {String.valueOf(executionTime)};
@@ -185,6 +185,16 @@ public class NewsElasticService implements NewsElasticInterface {
         TimeDocument timeDocument = new TimeDocument();
         timeDocument.setTime(executionTime);
         timeDocumentInterface.save(timeDocument);
+
+        long startTime_ = System.nanoTime();
+        List<News> news = newsInterface.findByDescriptionWithSql(query);
+        long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long duration = (endTime_ - startTime_) / 1000000;
+        FileWriter writer_ = new FileWriter(csvSqlFile, true);
+        CSVWriter csvWriter_ = new CSVWriter(writer_);
+        String[] data_ = {String.valueOf(duration)};
+        csvWriter_.writeNext(data_);
+        csvWriter_.close();
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
