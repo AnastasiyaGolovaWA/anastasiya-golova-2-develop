@@ -9,7 +9,9 @@ import com.manager.rss.service.dao.NewsInterface;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,11 +115,14 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        QueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery("*" + query.toLowerCase() + "* OR *" + query.toUpperCase() + "* OR *" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*")
-                .field("tittle");
+        QueryBuilder queryBuilder = QueryBuilders.queryStringQuery("*" + query.toLowerCase() + "* OR *" + query.toUpperCase() + "* OR *" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*")
+                .field("tittle")
+                .fuzziness(Fuzziness.AUTO)
+                .defaultOperator(Operator.AND)
+                .analyzeWildcard(true);
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(queryStringQueryBuilder)
+                .withFilter(queryBuilder)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
@@ -169,6 +174,7 @@ public class NewsElasticService implements NewsElasticInterface {
                 .withFilter(boolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
+
         long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
         SearchHits<NewsDocument> searchHits =
                 elasticsearchOperations.search(searchQuery,
