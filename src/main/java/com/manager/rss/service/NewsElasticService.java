@@ -115,14 +115,14 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        QueryBuilder queryBuilder = QueryBuilders.queryStringQuery("*" + query.toLowerCase() + "* OR *" + query.toUpperCase() + "* OR *" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*")
-                .field("tittle")
-                .fuzziness(Fuzziness.AUTO)
-                .defaultOperator(Operator.AND)
-                .analyzeWildcard(true);
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toLowerCase() + "*"));
+        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toUpperCase() + "*"));
+        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
+
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(queryBuilder)
+                .withFilter(boolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
@@ -135,11 +135,6 @@ public class NewsElasticService implements NewsElasticInterface {
         long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         System.out.println("Execution time: " + executionTime + "ms");
 
-        FileWriter writer = new FileWriter(csvFile, true);
-        CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime)};
-        csvWriter.writeNext(data);
-        csvWriter.close();
         TimeDocument timeDocument = new TimeDocument();
         timeDocument.setTime(executionTime);
         timeDocumentInterface.save(timeDocument);
@@ -159,6 +154,11 @@ public class NewsElasticService implements NewsElasticInterface {
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
+        FileWriter writer = new FileWriter(csvFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size())};
+        csvWriter.writeNext(data);
+        csvWriter.close();
         return newsDocuments;
     }
 
@@ -183,11 +183,7 @@ public class NewsElasticService implements NewsElasticInterface {
         long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         System.out.println("Execution time: " + executionTime + "ms");
-        FileWriter writer = new FileWriter(csvFile, true);
-        CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime)};
-        csvWriter.writeNext(data);
-        csvWriter.close();
+
         TimeDocument timeDocument = new TimeDocument();
         timeDocument.setTime(executionTime);
         timeDocumentInterface.save(timeDocument);
@@ -207,6 +203,11 @@ public class NewsElasticService implements NewsElasticInterface {
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
+        FileWriter writer = new FileWriter(csvFile, true);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size())};
+        csvWriter.writeNext(data);
+        csvWriter.close();
         return newsDocuments;
     }
 }
