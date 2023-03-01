@@ -123,7 +123,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery)
-                .withPageable(PageRequest.of(0, 5))
+                //.withPageable(PageRequest.of(0, 15))
                 .build();
 
         long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
