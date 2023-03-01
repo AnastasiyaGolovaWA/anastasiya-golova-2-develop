@@ -156,7 +156,7 @@ public class NewsElasticService implements NewsElasticInterface {
         });
         FileWriter writer = new FileWriter(csvFile, true);
         CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size())};
+        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size()), "title"};
         csvWriter.writeNext(data);
         csvWriter.close();
         return newsDocuments;
@@ -205,7 +205,7 @@ public class NewsElasticService implements NewsElasticInterface {
         });
         FileWriter writer = new FileWriter(csvFile, true);
         CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size())};
+        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size()), "description"};
         csvWriter.writeNext(data);
         csvWriter.close();
         return newsDocuments;
