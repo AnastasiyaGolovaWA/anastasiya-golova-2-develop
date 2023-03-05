@@ -4,6 +4,7 @@ import com.manager.rss.entity.document.NewsDocument;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,12 @@ public class NewsElasticController {
     @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
     public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
         return newsElasticInterface.processSearchByTittle(tittle);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/news/repo/{tittle}", method = RequestMethod.GET)
+    public Page<NewsDocument> getByTittleRepo(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
+        return newsElasticInterface.getNewsByTittle(tittle, PageRequest.of(0, 20));
     }
 
     @ResponseBody

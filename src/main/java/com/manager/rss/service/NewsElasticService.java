@@ -10,6 +10,7 @@ import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -59,9 +60,18 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public Page<NewsDocument> getNewsByTittle(final String tittle, final PageRequest pageRequest) {
-        return repository.findByTittle(tittle, pageRequest);
+    public Page<NewsDocument> getNewsByTittle(String tittle, PageRequest pageRequest) {
+        QueryBuilder queryBuilder = QueryBuilders.matchQuery("tittle", tittle);
+
+        Page<NewsDocument> result = repository.search(queryBuilder, pageRequest);
+
+        if (result.isEmpty()) {
+            queryBuilder = QueryBuilders.queryStringQuery("*" + tittle.toLowerCase() + "* OR *" + tittle.toUpperCase() + "* OR *" + Character.toUpperCase(tittle.charAt(0)) + tittle.substring(1).toLowerCase() + "*");
+            result = repository.search(queryBuilder, pageRequest);
+        }
+        return result;
     }
+
 
     @Override
     public NewsDocument save(final NewsDocument newNewsDocument) {
@@ -123,7 +133,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery)
-                //.withPageable(PageRequest.of(0, 15))
+                .withPageable(PageRequest.of(0, 5))
                 .build();
 
         long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
