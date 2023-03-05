@@ -9,10 +9,7 @@ import com.manager.rss.service.dao.NewsInterface;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
-import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.regexpQuery;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
@@ -45,9 +41,13 @@ public class NewsElasticService implements NewsElasticInterface {
 
     private final NewsInterface newsInterface;
 
-    String csvFile = "time_elastic.csv";
+    String csvFile = "time_elastic_title.csv";
 
-    String csvSqlFile = "time_sql.csv";
+    String csvSqlFile = "time_sql_title.csv";
+
+    String csvFile1 = "time_elastic_description.csv";
+
+    String csvSqlFile1 = "time_sql_description.csv";
 
     @Autowired
     public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository, final TimeDocumentInterface timeDocumentInterface, final NewsInterface newsInterface) {
@@ -81,7 +81,7 @@ public class NewsElasticService implements NewsElasticInterface {
     @Override
     public List<NewsDocument> processSearchByDate(String date_, String date1_) throws IOException {
         LocalDate date = LocalDate.parse(date_);
-        LocalDate date1 =LocalDate.parse(date1_);
+        LocalDate date1 = LocalDate.parse(date1_);
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
 
         queryBuilder.must(rangeQuery("pubDate").from(date).to(date1));
@@ -143,22 +143,16 @@ public class NewsElasticService implements NewsElasticInterface {
         List<News> news = newsInterface.findByTittleWithSql(query);
         long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long duration = (endTime_ - startTime_) / 1000000;
-        FileWriter writer_ = new FileWriter(csvSqlFile, true);
-        CSVWriter csvWriter_ = new CSVWriter(writer_);
-        String[] data_ = {String.valueOf(duration)};
-        csvWriter_.writeNext(data_);
-        csvWriter_.close();
+
+        writeToFile(csvSqlFile, duration, query, "title");
+
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
-        FileWriter writer = new FileWriter(csvFile, true);
-        CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size()), "title"};
-        csvWriter.writeNext(data);
-        csvWriter.close();
+        writeToFile(csvFile, executionTime, query, "title");
         return newsDocuments;
     }
 
@@ -192,22 +186,26 @@ public class NewsElasticService implements NewsElasticInterface {
         List<News> news = newsInterface.findByDescriptionWithSql(query);
         long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long duration = (endTime_ - startTime_) / 1000000;
-        FileWriter writer_ = new FileWriter(csvSqlFile, true);
-        CSVWriter csvWriter_ = new CSVWriter(writer_);
-        String[] data_ = {String.valueOf(duration)};
-        csvWriter_.writeNext(data_);
-        csvWriter_.close();
+
+        writeToFile(csvSqlFile1, duration, query, "description");
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
-        FileWriter writer = new FileWriter(csvFile, true);
-        CSVWriter csvWriter = new CSVWriter(writer);
-        String[] data = {String.valueOf(executionTime), query, String.valueOf(newsDocuments.size()), "description"};
-        csvWriter.writeNext(data);
-        csvWriter.close();
+        writeToFile(csvFile1, executionTime, query, "description");
+
         return newsDocuments;
     }
+
+    public static void writeToFile(final String file, final long time, final String query, final String field) throws IOException {
+        final FileWriter writer = new FileWriter(file, true);
+        final CSVWriter csvWriter = new CSVWriter(writer);
+        final String[] data = {String.valueOf(time), query, field};
+        csvWriter.writeNext(data);
+        csvWriter.close();
+    }
 }
+
+

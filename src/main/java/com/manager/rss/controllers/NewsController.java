@@ -21,7 +21,7 @@ import java.util.List;
 public class NewsController {
     private NewsInterface newsInterface;
 
-    String csvSqlFile = "time_sql.csv";
+    String csvSqlFile = "time_sql_title.csv";
 
     @Autowired
     public void setNewsInterface(final NewsInterface newsInterface) {

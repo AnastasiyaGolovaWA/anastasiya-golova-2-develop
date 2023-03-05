@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -19,13 +20,13 @@ public class NewsElasticController {
 
     @ResponseBody
     @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
-    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) throws IOException {
+    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
         return newsElasticInterface.processSearchByTittle(tittle);
     }
 
     @ResponseBody
     @RequestMapping(value = "/tittle_time/{tittle}", method = RequestMethod.GET)
-    public String[] getTittleTime(@PathVariable("tittle") final String tittle) throws IOException {
+    public String[] getTittleTime(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
         long startTime = System.nanoTime();
         List<NewsDocument> news = newsElasticInterface.processSearchByTittle(tittle);
         long endTime = System.nanoTime();
