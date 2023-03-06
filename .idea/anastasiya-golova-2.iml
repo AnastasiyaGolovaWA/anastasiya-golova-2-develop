@@ -57,7 +57,10 @@
     <orderEntry type="library" name="Maven: com.sun.istack:istack-commons-runtime:3.0.11" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.activation:jakarta.activation:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:2.3.5.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:2.3.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:5.2.11.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.2.11.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.2.11.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.2.11.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aspects:5.2.11.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.18.20" level="project" />
@@ -146,14 +149,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.6.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testcontainers:elasticsearch:1.16.2" level="project" />
     <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:6.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-elasticsearch:2.4.13" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-elasticsearch:4.0.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.2.11.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.2.11.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:2.3.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.elasticsearch.client:transport:7.6.2" level="project" />
-    <orderEntry type="library" name="Maven: org.elasticsearch.plugin:reindex-client:7.6.2" level="project" />
-    <orderEntry type="library" name="Maven: org.elasticsearch:elasticsearch-ssl-config:7.6.2" level="project" />
-    <orderEntry type="library" name="Maven: org.elasticsearch.plugin:percolator-client:7.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:transport-netty4-client:7.6.2" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.54.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.54.Final" level="project" />
@@ -163,7 +160,6 @@
     <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.54.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.54.Final" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.3" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.3" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.client:elasticsearch-rest-high-level-client:7.15.2" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.client:elasticsearch-rest-client:7.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
@@ -214,8 +210,8 @@
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.3" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
-    <orderEntry type="library" name="Maven: io.github.delirius325:jmeter.backendlistener.elasticsearch:2.4.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-buildpack-platform:2.3.6.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: net.java.dev.jna:jna-platform:5.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />

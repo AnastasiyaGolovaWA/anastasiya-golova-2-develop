@@ -101,10 +101,11 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-elasticsearch</artifactId>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <version>2.4.13</version>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
@@ -121,11 +122,6 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.delirius325</groupId>
-            <artifactId>jmeter.backendlistener.elasticsearch</artifactId>
-            <version>2.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
