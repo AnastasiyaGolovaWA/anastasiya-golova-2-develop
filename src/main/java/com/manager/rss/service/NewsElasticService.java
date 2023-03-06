@@ -33,7 +33,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
-    private static final String NEWS_INDEX = "index";
+    private static final String NEWS_INDEX = "index_news";
 
     private final ElasticsearchOperations elasticsearchOperations;
 
@@ -130,7 +130,7 @@ public class NewsElasticService implements NewsElasticInterface {
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toLowerCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toUpperCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
-        boolQuery.should(QueryBuilders.fuzzyQuery("tittle", query).fuzziness(Fuzziness.AUTO));
+        boolQuery.should(QueryBuilders.matchQuery("tittle", query).fuzziness(Fuzziness.AUTO));
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery)
