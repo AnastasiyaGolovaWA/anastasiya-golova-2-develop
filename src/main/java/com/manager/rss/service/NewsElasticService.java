@@ -125,7 +125,7 @@ public class NewsElasticService implements NewsElasticInterface {
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
         MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("tittle", query)
-                .operator(Operator.OR)
+                .operator(Operator.AND)
                 .fuzziness(Fuzziness.AUTO)
                 .prefixLength(3)
                 .maxExpansions(10);
