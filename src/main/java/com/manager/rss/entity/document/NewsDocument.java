@@ -9,19 +9,19 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
 
-@Document(indexName = "index_news")
+@Document(indexName = "news_rss")
 @Data
 public class NewsDocument {
     @Id
     private String id;
 
-    @Field(type = FieldType.Keyword, name = "tittle")
+    @Field(type = FieldType.Text, name = "tittle")
     private String tittle;
 
     @Field(type = FieldType.Text, name = "link")
     private String link;
 
-    @Field(type = FieldType.Keyword, name = "description")
+    @Field(type = FieldType.Text, name = "description")
     private String description;
 
     @Field(type = FieldType.Date, name = "pubDate", format = DateFormat.date)

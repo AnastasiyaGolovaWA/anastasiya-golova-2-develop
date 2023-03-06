@@ -99,7 +99,7 @@ public class NewsService implements NewsInterface {
 
     private boolean existNews(final News a) {
         for (final News s : getAll()) {
-            if (a.getLink().equals(s.getLink()) && a.getPubDate().equals(s.getPubDate())) {
+            if (a.getLink().equals(s.getLink()) && a.getTittle().equals(s.getTittle())) {
                 return true;
             }
         }

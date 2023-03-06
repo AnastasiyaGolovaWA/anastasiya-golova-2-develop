@@ -10,9 +10,7 @@ import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +31,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
-    private static final String NEWS_INDEX = "index_news";
+    private static final String NEWS_INDEX = "news_rss";
 
     private final ElasticsearchOperations elasticsearchOperations;
 
@@ -126,14 +124,16 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toLowerCase() + "*"));
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toUpperCase() + "*"));
-        boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
-        boolQuery.should(QueryBuilders.matchQuery("tittle", query).fuzziness(Fuzziness.AUTO));
+        MultiMatchQueryBuilder multiMatchQuery = QueryBuilders.multiMatchQuery(query, "tittle", "description")
+                .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+                .operator(Operator.OR)
+                .fuzziness(Fuzziness.AUTO)
+                .prefixLength(3)
+                .maxExpansions(10);
+
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(boolQuery)
+                .withFilter(multiMatchQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
