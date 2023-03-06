@@ -9,6 +9,7 @@ import com.manager.rss.service.dao.NewsInterface;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -129,7 +130,7 @@ public class NewsElasticService implements NewsElasticInterface {
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toLowerCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + query.toUpperCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("tittle", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
-
+        boolQuery.should(QueryBuilders.fuzzyQuery("tittle", query).fuzziness(Fuzziness.AUTO));
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery)
@@ -172,6 +173,7 @@ public class NewsElasticService implements NewsElasticInterface {
         boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + query.toLowerCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + query.toUpperCase() + "*"));
         boolQuery.should(QueryBuilders.wildcardQuery("description", "*" + Character.toUpperCase(query.charAt(0)) + query.substring(1).toLowerCase() + "*"));
+        boolQuery.should(QueryBuilders.fuzzyQuery("description", query).fuzziness(Fuzziness.AUTO));
 
 
         Query searchQuery = new NativeSearchQueryBuilder()
