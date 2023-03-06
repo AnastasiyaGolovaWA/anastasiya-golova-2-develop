@@ -124,16 +124,14 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        MultiMatchQueryBuilder multiMatchQuery = QueryBuilders.multiMatchQuery(query, "tittle", "description")
-                .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+        MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("tittle", query)
                 .operator(Operator.OR)
                 .fuzziness(Fuzziness.AUTO)
                 .prefixLength(3)
                 .maxExpansions(10);
 
-
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(multiMatchQuery)
+                .withFilter(matchQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
