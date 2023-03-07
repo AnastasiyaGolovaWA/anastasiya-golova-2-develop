@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
 
-@Document(indexName = "news_rss")
+@Document(indexName = "news_rss_news")
 @Data
 public class NewsDocument {
     @Id
