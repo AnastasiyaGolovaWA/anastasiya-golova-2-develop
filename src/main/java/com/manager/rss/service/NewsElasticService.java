@@ -9,6 +9,7 @@ import com.manager.rss.service.dao.NewsInterface;
 import com.manager.rss.service.elasticSearchService.NewsElasticInterface;
 import com.manager.rss.service.elasticSearchService.TimeDocumentInterface;
 import com.opencsv.CSVWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
@@ -123,15 +125,38 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearchByTittle(final String query) throws IOException {
-        MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("tittle", query)
-                .operator(Operator.AND)
-                .fuzziness(Fuzziness.AUTO)
-                .prefixLength(3)
-                .maxExpansions(10);
+    public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description) throws IOException {
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        if (!StringUtils.isEmpty(tittle) && StringUtils.isEmpty(description)) {
+            boolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+        } else if (StringUtils.isEmpty(tittle) && !StringUtils.isEmpty(description)) {
+            boolQuery.must(QueryBuilders.matchQuery("description", description)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+        } else if (!StringUtils.isEmpty(tittle) && !StringUtils.isEmpty(description)) {
+            boolQuery.should(QueryBuilders.matchQuery("tittle", tittle)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+            boolQuery.should(QueryBuilders.matchQuery("description", description)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+            boolQuery.minimumShouldMatch(1);
+        } else {
+            return Collections.emptyList();
+        }
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(matchQuery)
+                .withQuery(boolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
@@ -149,11 +174,11 @@ public class NewsElasticService implements NewsElasticInterface {
         timeDocumentInterface.save(timeDocument);
 
         long startTime_ = System.nanoTime();
-        List<News> news = newsInterface.findByTittleWithSql(query);
+        List<News> news = newsInterface.findByTittleWithSql(tittle);
         long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long duration = (endTime_ - startTime_) / 1000000;
 
-        writeToFile(csvSqlFile, duration, query, "title");
+        writeToFile(csvSqlFile, duration, tittle, "title");
 
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
@@ -161,7 +186,7 @@ public class NewsElasticService implements NewsElasticInterface {
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
-        writeToFile(csvFile, executionTime, query, "title");
+        writeToFile(csvFile, executionTime, tittle, "title");
         return newsDocuments;
     }
 

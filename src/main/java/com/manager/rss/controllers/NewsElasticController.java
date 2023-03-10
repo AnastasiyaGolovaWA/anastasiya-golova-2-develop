@@ -20,10 +20,14 @@ public class NewsElasticController {
     private NewsElasticInterface newsElasticInterface;
 
     @ResponseBody
-    @RequestMapping(value = "/news/{tittle}", method = RequestMethod.GET)
-    public List<NewsDocument> getByTittle(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
-        return newsElasticInterface.processSearchByTittle(tittle);
+    @RequestMapping(value = "/news/searchByTittleOrDescription", method = RequestMethod.GET)
+    public List<NewsDocument> getByTitleOrDescription(
+            @RequestParam(value = "tittle", required = false) String tittle,
+            @RequestParam(value = "description", required = false) String description
+    ) throws IOException, SQLException {
+        return newsElasticInterface.processSearchByTittleOrDescription(tittle, description);
     }
+
 
     @ResponseBody
     @RequestMapping(value = "/news/repo/{tittle}", method = RequestMethod.GET)
@@ -33,9 +37,9 @@ public class NewsElasticController {
 
     @ResponseBody
     @RequestMapping(value = "/tittle_time/{tittle}", method = RequestMethod.GET)
-    public String[] getTittleTime(@PathVariable("tittle") final String tittle) throws IOException, SQLException {
+    public String[] getTittleTime(@PathVariable("tittle") final String tittle, @PathVariable("description") final String description) throws IOException, SQLException {
         long startTime = System.nanoTime();
-        List<NewsDocument> news = newsElasticInterface.processSearchByTittle(tittle);
+        List<NewsDocument> news = newsElasticInterface.processSearchByTittleOrDescription(tittle, description);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
         return new String[]{duration / 1000000 + "мс", "Длина массива "+String.valueOf(news.size())};
