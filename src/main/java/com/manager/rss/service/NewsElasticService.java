@@ -126,8 +126,6 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
-        LocalDate date = LocalDate.parse(date_);
-        LocalDate date1 = LocalDate.parse(date1_);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(tittle) && StringUtils.isEmpty(description)) {
             boolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
@@ -155,6 +153,8 @@ public class NewsElasticService implements NewsElasticInterface {
             boolQuery.minimumShouldMatch(1);
         }
         else if (!StringUtils.isEmpty(date_) && !StringUtils.isEmpty(date1_)) {
+            LocalDate date = LocalDate.parse(date_);
+            LocalDate date1 = LocalDate.parse(date1_);
             RangeQueryBuilder dateRangeQuery = QueryBuilders.rangeQuery("pubDate")
                     .gte(date)
                     .lte(date1);
@@ -177,7 +177,7 @@ public class NewsElasticService implements NewsElasticInterface {
         long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         System.out.println("Execution time: " + executionTime + "ms");
-        
+
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
         searchHits.getSearchHits().forEach(searchHit -> {
