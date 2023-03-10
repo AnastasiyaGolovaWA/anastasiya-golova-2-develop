@@ -155,7 +155,7 @@ public class NewsElasticService implements NewsElasticInterface {
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
         BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(description)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("description", convert(description))
+            mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
@@ -165,7 +165,7 @@ public class NewsElasticService implements NewsElasticInterface {
         }
 
         if (!StringUtils.isEmpty(tittle)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", convert(tittle))
+            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
