@@ -126,46 +126,36 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        if (!StringUtils.isEmpty(tittle) && StringUtils.isEmpty(description)) {
-            boolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
+        BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
+        if (!StringUtils.isEmpty(description)) {
+            mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
-        } else if (StringUtils.isEmpty(tittle) && !StringUtils.isEmpty(description)) {
-            boolQuery.must(QueryBuilders.matchQuery("description", description)
-                    .operator(Operator.AND)
-                    .fuzziness(Fuzziness.AUTO)
-                    .prefixLength(3)
-                    .maxExpansions(10));
-        } else if (!StringUtils.isEmpty(tittle) && !StringUtils.isEmpty(description)) {
-            boolQuery.should(QueryBuilders.matchQuery("tittle", tittle)
-                    .operator(Operator.AND)
-                    .fuzziness(Fuzziness.AUTO)
-                    .prefixLength(3)
-                    .maxExpansions(10));
-            boolQuery.should(QueryBuilders.matchQuery("description", description)
-                    .operator(Operator.AND)
-                    .fuzziness(Fuzziness.AUTO)
-                    .prefixLength(3)
-                    .maxExpansions(10));
-            boolQuery.minimumShouldMatch(1);
+        } else {
+            mainBoolQuery.must(QueryBuilders.matchAllQuery());
         }
-        else if (!StringUtils.isEmpty(date_) && !StringUtils.isEmpty(date1_)) {
+
+        if (!StringUtils.isEmpty(tittle)) {
+            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+        }
+
+        if (!StringUtils.isEmpty(date_) && !StringUtils.isEmpty(date1_) && !"1970-01-01".equals(date_) && !"1970-01-01".equals(date1_)) {
             LocalDate date = LocalDate.parse(date_);
             LocalDate date1 = LocalDate.parse(date1_);
             RangeQueryBuilder dateRangeQuery = QueryBuilders.rangeQuery("pubDate")
                     .gte(date)
                     .lte(date1);
-            boolQuery.must(dateRangeQuery);
-        }
-        else {
-            return Collections.emptyList();
+            mainBoolQuery.must(dateRangeQuery);
         }
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery)
+                .withQuery(mainBoolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
