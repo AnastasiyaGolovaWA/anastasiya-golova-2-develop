@@ -31,7 +31,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class NewsElasticService implements NewsElasticInterface {
-    private static final String NEWS_INDEX = "news_rss";
+    private static final String NEWS_INDEX = "news_rss_news";
 
     private final ElasticsearchOperations elasticsearchOperations;
 
