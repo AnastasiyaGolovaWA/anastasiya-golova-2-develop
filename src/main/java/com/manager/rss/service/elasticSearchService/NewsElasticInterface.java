@@ -21,7 +21,7 @@ public interface NewsElasticInterface {
 
     List<NewsDocument> processSearchByDate(String date, String date1) throws IOException;
 
-    List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description) throws IOException, SQLException;
+    List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException, SQLException;
 
     List<NewsDocument> processSearchByDescription(final String query) throws IOException;
 }
