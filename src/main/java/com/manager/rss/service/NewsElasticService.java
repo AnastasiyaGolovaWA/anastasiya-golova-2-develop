@@ -124,11 +124,38 @@ public class NewsElasticService implements NewsElasticInterface {
         return newsMatches;
     }
 
+    public String convert(String message) {
+        boolean result = message.matches(".*\\p{InCyrillic}.*");
+        char[] ru = {'й','ц','у','к','е','н','г','ш','щ','з','х','ъ','ф','ы','в','а','п','р','о','л','д','ж','э', 'я','ч', 'с','м','и','т','ь','б', 'ю','.'};
+        char[] en = {'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','"','z','x','c','v','b','n','m',',','.','/'};
+        StringBuilder builder = new StringBuilder();
+
+        if (result) {
+            for (int i = 0; i < message.length(); i++) {
+                for (int j = 0; j < ru.length; j++ ) {
+                    if (message.charAt(i) == ru[j]) {
+                        builder.append(en[j]);
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < message.length(); i++) {
+                for (int j = 0; j < en.length; j++ ) {
+                    if (message.charAt(i) == en[j]) {
+                        builder.append(ru[j]);
+                    }
+                }
+            }
+        }
+
+        return builder.toString();
+    }
+
     @Override
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
         BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(description)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
+            mainBoolQuery.must(QueryBuilders.matchQuery("description", convert(description))
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
@@ -138,7 +165,7 @@ public class NewsElasticService implements NewsElasticInterface {
         }
 
         if (!StringUtils.isEmpty(tittle)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
+            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", convert(tittle))
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
