@@ -213,7 +213,9 @@ public class NewsElasticService implements NewsElasticInterface {
 
 
         long startTime1 = System.nanoTime();
-        newsInterface.findByTittle(tittle);
+        if (!StringUtils.isEmpty(tittle)) {
+            newsInterface.findByTittle(tittle);
+        }
         long endTime1 = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long executionTime1 = (endTime1 - startTime1) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         writeToFile(csvSqlFile, executionTime1, tittle, "title");
