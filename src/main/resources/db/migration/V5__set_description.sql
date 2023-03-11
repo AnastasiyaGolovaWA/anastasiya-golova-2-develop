@@ -1,0 +1,2 @@
+ALTER TABLE news
+ALTER COLUMN description TYPE VARCHAR(3000);

@@ -171,6 +171,11 @@ public class NewsElasticService implements NewsElasticInterface {
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
+            long startTime1 = System.nanoTime();
+            newsInterface.findByTittle(tittle);
+            long endTime1 = System.nanoTime(); // сохраняем время окончания выполнения запроса
+            long executionTime1 = (endTime1 - startTime1) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+            writeToFile(csvSqlFile, executionTime1);
         } else if (!StringUtils.isEmpty(description)) {
             mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
                     .operator(Operator.AND)
@@ -202,6 +207,7 @@ public class NewsElasticService implements NewsElasticInterface {
                         IndexCoordinates.of(NEWS_INDEX));
         long endTime = System.nanoTime();
         long executionTime = (endTime - startTime) / 1000000;
+        writeToFile(csvFile, executionTime);
         System.out.println("Execution time: " + executionTime + "ms");
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
@@ -209,16 +215,7 @@ public class NewsElasticService implements NewsElasticInterface {
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
-        writeToFile(csvFile, executionTime, tittle, "title");
 
-
-        long startTime1 = System.nanoTime();
-        if (!StringUtils.isEmpty(tittle)) {
-            newsInterface.findByTittle(tittle);
-        }
-        long endTime1 = System.nanoTime(); // сохраняем время окончания выполнения запроса
-        long executionTime1 = (endTime1 - startTime1) / 1000000; // вычисляем время выполнения запроса в миллисекундах
-        writeToFile(csvSqlFile, executionTime1, tittle, "title");
         return newsDocuments;
     }
 
@@ -254,22 +251,22 @@ public class NewsElasticService implements NewsElasticInterface {
         long endTime_ = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long duration = (endTime_ - startTime_) / 1000000;
 
-        writeToFile(csvSqlFile1, duration, query, "description");
+        writeToFile(csvSqlFile1, duration);
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
 
         searchHits.getSearchHits().forEach(searchHit -> {
             newsDocuments.add(searchHit.getContent());
         });
-        writeToFile(csvFile1, executionTime, query, "description");
+        writeToFile(csvFile1, executionTime);
 
         return newsDocuments;
     }
 
-    public static void writeToFile(final String file, final long time, final String query, final String field) throws IOException {
+    public static void writeToFile(final String file, final long time) throws IOException {
         final FileWriter writer = new FileWriter(file, true);
         final CSVWriter csvWriter = new CSVWriter(writer);
-        final String[] data = {String.valueOf(time), query, field};
+        final String[] data = {String.valueOf(time)};
         csvWriter.writeNext(data);
         csvWriter.close();
     }
