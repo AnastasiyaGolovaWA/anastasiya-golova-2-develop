@@ -154,45 +154,54 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
 
-        if (!StringUtils.isEmpty(tittle)) {
-            boolQuery.should(QueryBuilders.matchQuery("tittle", tittle)
+        if (!StringUtils.isEmpty(description) && !StringUtils.isEmpty(tittle)) {
+            mainBoolQuery.must(QueryBuilders.multiMatchQuery(description, tittle)
+                    .field("description", 2.0f)
+                    .field("tittle", 1.0f)
+                    .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
-        }
-
-        if (!StringUtils.isEmpty(description)) {
-            boolQuery.should(QueryBuilders.matchQuery("description", description)
+        } else if (!StringUtils.isEmpty(tittle)) {
+            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
+        } else if (!StringUtils.isEmpty(description)) {
+            mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
+                    .operator(Operator.AND)
+                    .fuzziness(Fuzziness.AUTO)
+                    .prefixLength(3)
+                    .maxExpansions(10));
+        } else {
+            mainBoolQuery.must(QueryBuilders.matchAllQuery());
         }
 
         if (!StringUtils.isEmpty(date_) && !StringUtils.isEmpty(date1_) && !"1970-01-01".equals(date_) && !"1970-01-01".equals(date1_)) {
-            LocalDate date = LocalDate.parse(date_);
-            LocalDate date1 = LocalDate.parse(date1_);
-            RangeQueryBuilder dateRangeQuery = QueryBuilders.rangeQuery("pubDate")
-                    .gte(date)
-                    .lte(date1);
-            boolQuery.must(dateRangeQuery);
+            LocalDate dateFromParsed = LocalDate.parse(date_);
+            LocalDate dateToParsed = LocalDate.parse(date1_);
+
+            mainBoolQuery.filter(QueryBuilders.rangeQuery("pubDate")
+                    .gte(dateFromParsed)
+                    .lte(dateToParsed));
         }
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery)
+                .withQuery(mainBoolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
-        long startTime = System.nanoTime(); // сохраняем время начала выполнения запроса
+        long startTime = System.nanoTime();
         SearchHits<NewsDocument> searchHits =
                 elasticsearchOperations.search(searchQuery,
                         NewsDocument.class,
                         IndexCoordinates.of(NEWS_INDEX));
-        long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
-        long executionTime = (endTime - startTime) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+        long endTime = System.nanoTime();
+        long executionTime = (endTime - startTime) / 1000000;
         System.out.println("Execution time: " + executionTime + "ms");
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
@@ -204,7 +213,7 @@ public class NewsElasticService implements NewsElasticInterface {
 
 
         long startTime1 = System.nanoTime();
-        newsInterface.findByTittleWithSql(tittle, description, date_, date1_);
+        //newsInterface.findByTittleWithSql(tittle, description, date_, date1_);
         long endTime1 = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long executionTime1 = (endTime1 - startTime1) / 1000000; // вычисляем время выполнения запроса в миллисекундах
         writeToFile(csvSqlFile, executionTime1, tittle, "title");

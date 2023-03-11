@@ -21,17 +21,16 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     @Query(value = "SELECT id_news, description, tittle, pub_date, link FROM news", nativeQuery = true)
     List<News> getNews();
 
-    @Query(value = "SELECT * " +
-            "FROM news " +
-            "WHERE to_tsvector('russian', tittle || ' ' || description || ' ' || pub_date) @@ " +
-            "    plainto_tsquery('russian', :title || ' & ' || :description) " +
-            "AND pub_date BETWEEN :startDate AND :endDate",
-            nativeQuery = true)
-    List<News> findByTitleAndDescriptionAndPubDateBetween(@Param("title") String title,
-                                                          @Param("description") String description,
-                                                          @Param("startDate") LocalDate startDate,
-                                                          @Param("endDate") LocalDate endDate);
-
+    @Query(value = "SELECT *\n" +
+            "FROM news\n" +
+            "WHERE \n" +
+            "    (:description IS NULL OR description ILIKE '%' || :description || '%')\n" +
+            "    AND (:title IS NULL OR title ILIKE '%' || :title || '%')\n" +
+            "LIMIT 5 OFFSET 0", nativeQuery = true)
+    List<News> findByTitleAndDescriptionAndPubDateBetween(
+            @Param("title") String title,
+            @Param("description") String description
+    );
 
     @Query(value = "SELECT * FROM news WHERE description ILIKE %:description%", nativeQuery = true)
     List<News> findByDescription(@Param("description") String description);
