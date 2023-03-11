@@ -182,6 +182,11 @@ public class NewsElasticService implements NewsElasticInterface {
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
+            long startTime0 = System.nanoTime();
+            newsInterface.findByDescriptionWithSql(description);
+            long endTime0 = System.nanoTime(); // сохраняем время окончания выполнения запроса
+            long executionTime1 = (endTime0 - startTime0) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+            writeToFile(csvSqlFile1, executionTime1);
         } else {
             mainBoolQuery.must(QueryBuilders.matchAllQuery());
         }
@@ -207,7 +212,7 @@ public class NewsElasticService implements NewsElasticInterface {
                         IndexCoordinates.of(NEWS_INDEX));
         long endTime = System.nanoTime();
         long executionTime = (endTime - startTime) / 1000000;
-        writeToFile(csvFile, executionTime);
+        writeToFile(csvFile1, executionTime);
         System.out.println("Execution time: " + executionTime + "ms");
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();
