@@ -1,5 +1,9 @@
 package com.manager.rss.test;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.manager.rss.entity.document.NewsDocument;
 import com.manager.rss.service.NewsElasticService;
 import com.manager.rss.service.NewsService;
@@ -25,7 +29,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -40,9 +43,20 @@ class ElasticsearchTest {
     @Container
     private static ElasticsearchContainer elasticsearchContainer = new NewsElasticsearchContainer();
 
+    private static ExtentHtmlReporter htmlReporter;
+    private static ExtentReports extentReports;
+
     @BeforeAll
     static void setUp() {
         elasticsearchContainer.start();
+
+        // Настройка ExtentReports и ExtentHtmlReporter
+        htmlReporter = new ExtentHtmlReporter("test-results.html");
+        htmlReporter.config().setDocumentTitle("Test Report");
+        htmlReporter.config().setReportName("Test Report");
+        htmlReporter.config().setTheme(Theme.DARK);
+        extentReports = new ExtentReports();
+        extentReports.attachReporter(htmlReporter);
     }
 
     @BeforeEach
@@ -52,12 +66,21 @@ class ElasticsearchTest {
 
     @Test
     void testNewsDocument() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("testNewsDocument", "Test search by title or description");
+
         List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smart", null, null, null);
         assertEquals(3, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
     }
 
     @AfterAll
     static void destroy() {
         elasticsearchContainer.stop();
+
+        // Закрытие отчета
+        extentReports.flush();
     }
 }
