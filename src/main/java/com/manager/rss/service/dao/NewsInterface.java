@@ -21,4 +21,6 @@ public interface NewsInterface {
     void clear();
 
     List<News> findByTittleOrDescription(String tittle, String description);
+
+    List<News> findByDateSql(String date, String date1, String description);
 }

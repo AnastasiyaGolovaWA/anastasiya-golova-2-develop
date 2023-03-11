@@ -26,4 +26,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     @Query(value = "SELECT * FROM news WHERE description ILIKE %:description%", nativeQuery = true)
     List<News> findByDescription(@Param("description") String description);
+
+    @Query(value = "SELECT * FROM news WHERE pub_date BETWEEN :date AND :date1 and description ILIKE %:description%", nativeQuery = true)
+    List<News> findByDateSql(@Param("date") String date, @Param("date1") String date1, @Param("description") String description);
 }

@@ -67,6 +67,11 @@ public class NewsService implements NewsInterface {
     }
 
     @Override
+    public List<News> findByDateSql(String date, String date1, String description) {
+        return newsRepository.findByDateSql(date, date1, description);
+    }
+
+    @Override
     public List<News> findByDescriptionWithSql(String description) {
         return newsRepository.findByDescription(description);
     }

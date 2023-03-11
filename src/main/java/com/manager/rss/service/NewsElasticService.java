@@ -26,8 +26,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
@@ -51,6 +54,10 @@ public class NewsElasticService implements NewsElasticInterface {
     String csvFile1 = "time_elastic_description.csv";
 
     String csvSqlFile1 = "time_sql_description.csv";
+
+    String csvFile2 = "time_elastic_date.csv";
+
+    String csvSqlFile2 = "time_sql_date.csv";
 
     @Autowired
     public NewsElasticService(final ElasticsearchOperations elasticsearchOperations, final NewsElasticSearchRepo repository, final TimeDocumentInterface timeDocumentInterface, final NewsInterface newsInterface) {
@@ -153,7 +160,7 @@ public class NewsElasticService implements NewsElasticInterface {
     }
 
     @Override
-    public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
+    public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException, ParseException {
         BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
 
         if (!StringUtils.isEmpty(description) && !StringUtils.isEmpty(tittle)) {
@@ -195,9 +202,21 @@ public class NewsElasticService implements NewsElasticInterface {
             LocalDate dateFromParsed = LocalDate.parse(date_);
             LocalDate dateToParsed = LocalDate.parse(date1_);
 
-            mainBoolQuery.filter(QueryBuilders.rangeQuery("pubDate")
+            RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("pubDate");
+            mainBoolQuery.filter(rangeQuery
                     .gte(dateFromParsed)
                     .lte(dateToParsed));
+            long startTime2 = System.nanoTime();
+            SimpleDateFormat outputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = inputFormat.parse(date_);
+            Date date1 = inputFormat.parse(date1_);
+            String formattedDate = outputFormat.format(date);
+            String formattedDate1 = outputFormat.format(date1);
+            newsInterface.findByDateSql(formattedDate, formattedDate1, description);
+            long endTime2 = System.nanoTime(); // сохраняем время окончания выполнения запроса
+            long executionTime2 = (endTime2 - startTime2) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+            writeToFile(csvSqlFile2, executionTime2);
         }
 
         Query searchQuery = new NativeSearchQueryBuilder()
@@ -212,7 +231,7 @@ public class NewsElasticService implements NewsElasticInterface {
                         IndexCoordinates.of(NEWS_INDEX));
         long endTime = System.nanoTime();
         long executionTime = (endTime - startTime) / 1000000;
-        writeToFile(csvFile1, executionTime);
+        writeToFile(csvFile2, executionTime);
         System.out.println("Execution time: " + executionTime + "ms");
 
         List<NewsDocument> newsDocuments = new ArrayList<NewsDocument>();

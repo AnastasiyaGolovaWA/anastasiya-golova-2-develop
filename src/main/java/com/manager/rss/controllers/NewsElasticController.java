@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class NewsElasticController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "date_", required = false) String date_,
             @RequestParam(value = "date1_", required = false) String date1_
-    ) throws IOException, SQLException {
+    ) throws IOException, SQLException, ParseException {
         return newsElasticInterface.processSearchByTittleOrDescription(tittle, description, date_, date1_);
     }
 
