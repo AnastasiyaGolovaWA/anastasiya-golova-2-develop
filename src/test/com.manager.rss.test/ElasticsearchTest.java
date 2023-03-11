@@ -17,6 +17,8 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,9 +58,9 @@ class ElasticsearchTest {
     }
 
     @Test
-    void testNewsDocument() {
-        Page<NewsDocument> result = newsElasticService.getNewsByTittle("Телефонные мошенники начали обманывать россиян с помощью «Госуслуг»", PageRequest.of(0, 20));
-        assertEquals(0, result.getTotalElements());
+    void testNewsDocument() throws IOException, ParseException {
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smart", null, null, null);
+        assertEquals(3, result.size());
     }
 
     @AfterAll
