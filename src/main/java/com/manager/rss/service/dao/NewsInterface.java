@@ -12,7 +12,7 @@ public interface NewsInterface {
 
     List<NewsDto> getNews();
 
-    List<News> findByTittleWithSql(String tittle, String description, String start, String end);
+    List<News> findByTittle(String tittle);
 
     List<News> findByDescriptionWithSql(String description);
 

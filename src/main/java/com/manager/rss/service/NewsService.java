@@ -62,8 +62,8 @@ public class NewsService implements NewsInterface {
     }
 
     @Override
-    public List<News> findByTittleWithSql(String tittle, String description, String start, String end) {
-        return newsRepository.findByTitleAndDescriptionAndPubDateBetween(tittle, description);
+    public List<News> findByTittle(String tittle) {
+        return newsRepository.findByTittle(tittle);
     }
 
     @Override
