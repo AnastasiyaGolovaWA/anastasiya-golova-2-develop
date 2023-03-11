@@ -206,17 +206,6 @@ public class NewsElasticService implements NewsElasticInterface {
             mainBoolQuery.filter(rangeQuery
                     .gte(dateFromParsed)
                     .lte(dateToParsed));
-            long startTime2 = System.nanoTime();
-            SimpleDateFormat outputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = inputFormat.parse(date_);
-            Date date1 = inputFormat.parse(date1_);
-            String formattedDate = outputFormat.format(date);
-            String formattedDate1 = outputFormat.format(date1);
-            newsInterface.findByDateSql(formattedDate, formattedDate1, description);
-            long endTime2 = System.nanoTime(); // сохраняем время окончания выполнения запроса
-            long executionTime2 = (endTime2 - startTime2) / 1000000; // вычисляем время выполнения запроса в миллисекундах
-            writeToFile(csvSqlFile2, executionTime2);
         }
 
         Query searchQuery = new NativeSearchQueryBuilder()

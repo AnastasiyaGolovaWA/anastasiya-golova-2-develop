@@ -65,12 +65,96 @@ class ElasticsearchTest {
     }
 
     @Test
-    void testNewsDocument() throws IOException, ParseException {
+    void testNewsDocumentByTitle() throws IOException, ParseException {
         // Создание теста в отчете
-        ExtentTest test = extentReports.createTest("testNewsDocument", "Test search by title or description");
+        ExtentTest test = extentReports.createTest("Поиск по заголовку", "Поиск по заголовку содержащему 'smart'");
 
         List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smart", null, null, null);
         assertEquals(3, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByTitleWithPhrase() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по заголовку содержащему фразу", "Поиск по заголовку содержащему фразу 'Ученые составили полную карту мозга дрозофилы'");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("Ученые составили полную карту мозга дрозофилы", null, null, null);
+        assertEquals(1, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByTittleWithMisspell() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по заголовку с опечаткой", "Поиск по заголовку содержащему 'smartt'");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smartt", null, null, null);
+        assertEquals(3, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByDescription() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по описанию", "Поиск по описанию содержащему 'small'");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription(null, "small", null, null);
+        assertEquals(1, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByDescriptionWithMisspell() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по описанию с опечаткой", "Поиск по описанию содержащему 'smallt'");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription(null, "smalll", null, null);
+        assertEquals(1, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByDateRange() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по диапазону дат", "Поиск по датам с 3 марта 2023 по 7 марта 2023");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription(null, null, "2023-03-03", "2023-03-07");
+        assertEquals(5, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByDateRangeAndTittle() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по диапазону дат и заголовку", "Поиск по датам с 3 марта 2023 по 7 марта 2023 и заголовку содержащему 'smart");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smart", null, "2023-03-03", "2023-03-07");
+        assertEquals(0, result.size());
+
+        // Добавление шага в тест
+        test.pass("Test passed");
+    }
+
+    @Test
+    void testNewsDocumentByDateRangeAndDescription() throws IOException, ParseException {
+        // Создание теста в отчете
+        ExtentTest test = extentReports.createTest("Поиск по диапазону дат и описанию", "Поиск по датам с 20 февраля 2023 по 23 февраля 2023 и описанию содержащему 'small");
+
+        List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription(null, "small", "2023-02-20", "2023-02-23");
+        assertEquals(1, result.size());
 
         // Добавление шага в тест
         test.pass("Test passed");
