@@ -12,6 +12,8 @@ import com.opencsv.CSVWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
@@ -126,13 +127,13 @@ public class NewsElasticService implements NewsElasticInterface {
 
     public String convert(String message) {
         boolean result = message.matches(".*\\p{InCyrillic}.*");
-        char[] ru = {'й','ц','у','к','е','н','г','ш','щ','з','х','ъ','ф','ы','в','а','п','р','о','л','д','ж','э', 'я','ч', 'с','м','и','т','ь','б', 'ю','.'};
-        char[] en = {'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','"','z','x','c','v','b','n','m',',','.','/'};
+        char[] ru = {'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.'};
+        char[] en = {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '"', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'};
         StringBuilder builder = new StringBuilder();
 
         if (result) {
             for (int i = 0; i < message.length(); i++) {
-                for (int j = 0; j < ru.length; j++ ) {
+                for (int j = 0; j < ru.length; j++) {
                     if (message.charAt(i) == ru[j]) {
                         builder.append(en[j]);
                     }
@@ -140,7 +141,7 @@ public class NewsElasticService implements NewsElasticInterface {
             }
         } else {
             for (int i = 0; i < message.length(); i++) {
-                for (int j = 0; j < en.length; j++ ) {
+                for (int j = 0; j < en.length; j++) {
                     if (message.charAt(i) == en[j]) {
                         builder.append(ru[j]);
                     }
@@ -153,19 +154,18 @@ public class NewsElasticService implements NewsElasticInterface {
 
     @Override
     public List<NewsDocument> processSearchByTittleOrDescription(final String tittle, String description, String date_, String date1_) throws IOException {
-        BoolQueryBuilder mainBoolQuery = QueryBuilders.boolQuery();
-        if (!StringUtils.isEmpty(description)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("description", description)
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        if (!StringUtils.isEmpty(tittle)) {
+            boolQuery.should(QueryBuilders.matchQuery("tittle", tittle)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
                     .maxExpansions(10));
-        } else {
-            mainBoolQuery.must(QueryBuilders.matchAllQuery());
         }
 
-        if (!StringUtils.isEmpty(tittle)) {
-            mainBoolQuery.must(QueryBuilders.matchQuery("tittle", tittle)
+        if (!StringUtils.isEmpty(description)) {
+            boolQuery.should(QueryBuilders.matchQuery("description", description)
                     .operator(Operator.AND)
                     .fuzziness(Fuzziness.AUTO)
                     .prefixLength(3)
@@ -178,11 +178,11 @@ public class NewsElasticService implements NewsElasticInterface {
             RangeQueryBuilder dateRangeQuery = QueryBuilders.rangeQuery("pubDate")
                     .gte(date)
                     .lte(date1);
-            mainBoolQuery.must(dateRangeQuery);
+            boolQuery.must(dateRangeQuery);
         }
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(mainBoolQuery)
+                .withQuery(boolQuery)
                 .withPageable(PageRequest.of(0, 5))
                 .build();
 
@@ -201,6 +201,13 @@ public class NewsElasticService implements NewsElasticInterface {
             newsDocuments.add(searchHit.getContent());
         });
         writeToFile(csvFile, executionTime, tittle, "title");
+
+
+        long startTime1 = System.nanoTime();
+        newsInterface.findByTittleWithSql(tittle, description, date_, date1_);
+        long endTime1 = System.nanoTime(); // сохраняем время окончания выполнения запроса
+        long executionTime1 = (endTime1 - startTime1) / 1000000; // вычисляем время выполнения запроса в миллисекундах
+        writeToFile(csvSqlFile, executionTime1, tittle, "title");
         return newsDocuments;
     }
 

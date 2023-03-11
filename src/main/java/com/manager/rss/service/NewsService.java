@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -61,8 +62,10 @@ public class NewsService implements NewsInterface {
     }
 
     @Override
-    public List<News> findByTittleWithSql(String tittle) {
-        return newsRepository.findByTittle(tittle);
+    public List<News> findByTittleWithSql(String tittle, String description, String start, String end) {
+        LocalDate date = LocalDate.parse(start);
+        LocalDate date1 = LocalDate.parse(end);
+        return newsRepository.findByTitleAndDescriptionAndPubDateBetween(tittle, description, date, date1);
     }
 
     @Override

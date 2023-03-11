@@ -86,7 +86,8 @@ public class NewsController {
     @RequestMapping(value = "/findByTittleWithSql", method = RequestMethod.GET)
     public String[] findByTittleWithSql(@RequestParam(required = false, defaultValue = "") final String tittle) throws IOException {
         long startTime = System.nanoTime();
-        List<News> news = newsInterface.findByTittleWithSql(tittle);
+        //List<News> news = newsInterface.findByTittleWithSql(tittle);
+        List<News> news = null;
         long endTime = System.nanoTime(); // сохраняем время окончания выполнения запроса
         long duration = (endTime - startTime) / 1000000;
         FileWriter writer = new FileWriter(csvSqlFile, true);
