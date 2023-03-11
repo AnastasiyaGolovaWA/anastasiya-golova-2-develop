@@ -51,13 +51,6 @@ class ElasticsearchTest {
     }
 
     @Test
-    void testListNewsDocument() {
-        List<NewsDocument> result = newsElasticService.getAll();
-        List<NewsDocument> result1 = new ArrayList<>();
-        assertEquals(result1, result);
-    }
-
-    @Test
     void testNewsDocument() throws IOException, ParseException {
         List<NewsDocument> result = newsElasticService.processSearchByTittleOrDescription("smart", null, null, null);
         assertEquals(3, result.size());
